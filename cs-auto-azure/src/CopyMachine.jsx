@@ -1,13 +1,14 @@
 import React, { useState } from "react";
 import axios from "axios";
-import { PAT_TOKEN } from "../constants/patToken";
+import { PAT_TOKEN } from "./constants/patToken";
 
 const organization = "cs-internship";
 const project = "CS Internship Program";
 const auth = `Basic ${btoa(`:${PAT_TOKEN}`)}`;
 
-const Playground8 = ({ workItemId }) => {
+const CopyMachine = ({ workItemId, sprintNumber }) => {
     const [status, setStatus] = useState("");
+    const [loading, setLoading] = useState(false);
 
     // Step 1: Fetch Work Item Details
     const getWorkItemDetails = async (id) => {
@@ -53,7 +54,7 @@ const Playground8 = ({ workItemId }) => {
                     op: "add",
                     path: "/relations/-",
                     value: {
-                        rel: "System.LinkTypes.Hierarchy-Reverse", // لینک به Parent
+                        rel: "System.LinkTypes.Hierarchy-Reverse",
                         url: `https://dev.azure.com/${organization}/${project}/_apis/wit/workItems/${parentId}`,
                         attributes: { isLocked: false, name: "Parent" },
                     },
@@ -98,22 +99,25 @@ const Playground8 = ({ workItemId }) => {
         }
 
         try {
-            console.log("Cloning work item ID >>", workItemId);
+            setLoading(true);
+            setStatus("Cloning work item...");
 
             // Step 3.1: Fetch Original Work Item
             const originalWorkItem = await getWorkItemDetails(workItemId);
 
             // Step 3.2: Extract Fields to Copy
             const fieldsToCopy = {
-                "System.Title":
-                    originalWorkItem.fields["System.Title"] + " - Copy - PL8",
+                "System.Title": createTitle(
+                    originalWorkItem.fields["System.Title"]
+                ),
                 "System.Description":
                     originalWorkItem.fields["System.Description"] ||
                     "No description",
                 "System.AreaPath":
                     originalWorkItem.fields["System.AreaPath"] || "",
                 "System.IterationPath":
-                    originalWorkItem.fields["System.IterationPath"] || "",
+                    originalWorkItem.fields["System.IterationPath"] +
+                        `\\Sprint O-${sprintNumber}` || "",
                 "Microsoft.VSTS.Common.Priority":
                     originalWorkItem.fields["Microsoft.VSTS.Common.Priority"] ||
                     2,
@@ -268,13 +272,15 @@ const Playground8 = ({ workItemId }) => {
                     const childTask = await getWorkItemDetails(childId);
 
                     const childFieldsToCopy = {
-                        "System.Title":
-                            childTask.fields["System.Title"] + " - Copy - PL8",
+                        "System.Title": createTitle(
+                            childTask.fields["System.Title"]
+                        ),
                         "System.Description":
                             childTask.fields["System.Description"],
                         "System.AreaPath": childTask.fields["System.AreaPath"],
                         "System.IterationPath":
-                            childTask.fields["System.IterationPath"],
+                            childTask.fields["System.IterationPath"] +
+                            `\\Sprint O-${sprintNumber}`,
                         "Microsoft.VSTS.Common.Priority":
                             childTask.fields["Microsoft.VSTS.Common.Priority"],
                         "System.Tags": childTask.fields["System.Tags"],
@@ -299,16 +305,28 @@ const Playground8 = ({ workItemId }) => {
             }
         } catch (error) {
             console.error("Error cloning work item >>", error);
+            setStatus("Failed to clone work item.");
+        } finally {
+            setLoading(false);
         }
     };
 
+    const createTitle = (originalTitle) => {
+        let newTitle = originalTitle.replace(/\[Sprint No.\]/g, sprintNumber);
+        newTitle = newTitle.replace(/\[TEMPLATE\] /g, "");
+
+        return newTitle;
+    };
+
     return (
-        <div>
-            <h1>Clone Work Item</h1>
-            <p>Status: {status}</p>
-            <button onClick={handleCloneWorkItem}>Clone Work Item</button>
-        </div>
+        <>
+            <h1>Status: {status}</h1>
+
+            <button onClick={handleCloneWorkItem} disabled={loading}>
+                {loading ? "Cloning..." : "Clone Work Item"}
+            </button>
+        </>
     );
 };
 
-export default Playground8;
+export default CopyMachine;

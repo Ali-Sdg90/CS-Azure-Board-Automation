@@ -8,8 +8,20 @@ import Playground5 from "./test/Playground5";
 import Playground6 from "./test/Playground6";
 import Playground7 from "./test/Playground7";
 import Playground8 from "./test/Playground8";
+import Playground9 from "./test/Playground9";
+import CopyMachine from "./CopyMachine";
 
 const App = () => {
+    const backlogsToCopy = [28939, 28894, 28945];
+
+    const sprintNumber = 272;
+
+    const iterateOnListOfBacklogs = () => {
+        return backlogsToCopy.map((id) => (
+            <CopyMachine key={id} workItemId={id} sprintNumber={sprintNumber} />
+        ));
+    };
+
     return (
         <div>
             <h1>hi</h1>
@@ -22,7 +34,11 @@ const App = () => {
             {/* <Playground5 workItemId={28751} /> */}
             {/* <Playground6 workItemId={28751} /> */}
             {/* <Playground7 workItemId={28751} /> */}
-            <Playground8 workItemId={28751} />
+            {/* <Playground8 workItemId={28751} /> */}
+            {/* <Playground9 /> */}
+            {/* <CopyMachine workItemId={28894} sprintNumber={273} /> */}
+
+            {iterateOnListOfBacklogs()}
         </div>
     );
 };

@@ -6,8 +6,10 @@ const organization = "cs-internship";
 const project = "CS Internship Program";
 const auth = `Basic ${btoa(`:${PAT_TOKEN}`)}`;
 
-const Playground8 = ({ workItemId }) => {
+const Playground9 = () => {
+    const [workItemId, setWorkItemId] = useState("");
     const [status, setStatus] = useState("");
+    const [loading, setLoading] = useState(false);
 
     // Step 1: Fetch Work Item Details
     const getWorkItemDetails = async (id) => {
@@ -53,7 +55,7 @@ const Playground8 = ({ workItemId }) => {
                     op: "add",
                     path: "/relations/-",
                     value: {
-                        rel: "System.LinkTypes.Hierarchy-Reverse", // لینک به Parent
+                        rel: "System.LinkTypes.Hierarchy-Reverse",
                         url: `https://dev.azure.com/${organization}/${project}/_apis/wit/workItems/${parentId}`,
                         attributes: { isLocked: false, name: "Parent" },
                     },
@@ -98,7 +100,8 @@ const Playground8 = ({ workItemId }) => {
         }
 
         try {
-            console.log("Cloning work item ID >>", workItemId);
+            setLoading(true);
+            setStatus("Cloning work item...");
 
             // Step 3.1: Fetch Original Work Item
             const originalWorkItem = await getWorkItemDetails(workItemId);
@@ -106,7 +109,7 @@ const Playground8 = ({ workItemId }) => {
             // Step 3.2: Extract Fields to Copy
             const fieldsToCopy = {
                 "System.Title":
-                    originalWorkItem.fields["System.Title"] + " - Copy - PL8",
+                    originalWorkItem.fields["System.Title"] + " - Copy - PL9",
                 "System.Description":
                     originalWorkItem.fields["System.Description"] ||
                     "No description",
@@ -157,6 +160,8 @@ const Playground8 = ({ workItemId }) => {
                 );
 
                 try {
+                    await new Promise((resolve) => setTimeout(resolve, 1000));
+
                     const clonedWorkItem = await getWorkItemDetails(
                         clonedBacklog.id
                     );
@@ -269,7 +274,7 @@ const Playground8 = ({ workItemId }) => {
 
                     const childFieldsToCopy = {
                         "System.Title":
-                            childTask.fields["System.Title"] + " - Copy - PL8",
+                            childTask.fields["System.Title"] + " - Copy - PL9",
                         "System.Description":
                             childTask.fields["System.Description"],
                         "System.AreaPath": childTask.fields["System.AreaPath"],
@@ -299,16 +304,27 @@ const Playground8 = ({ workItemId }) => {
             }
         } catch (error) {
             console.error("Error cloning work item >>", error);
+            setStatus("Failed to clone work item.");
+        } finally {
+            setLoading(false);
         }
     };
 
     return (
         <div>
             <h1>Clone Work Item</h1>
+            <input
+                type="text"
+                value={workItemId}
+                onChange={(e) => setWorkItemId(e.target.value)}
+                placeholder="Enter Work Item ID"
+            />
             <p>Status: {status}</p>
-            <button onClick={handleCloneWorkItem}>Clone Work Item</button>
+            <button onClick={handleCloneWorkItem} disabled={loading}>
+                {loading ? "Cloning..." : "Clone Work Item"}
+            </button>
         </div>
     );
 };
 
-export default Playground8;
+export default Playground9;
