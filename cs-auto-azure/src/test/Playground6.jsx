@@ -6,47 +6,47 @@ const organization = "cs-internship";
 const project = "CS Internship Program";
 const auth = `Basic ${btoa(`:${PAT_TOKEN}`)}`;
 
-const Playground5 = ({ workItemId }) => {
+const Playground6 = ({ workItemId }) => {
     const [status, setStatus] = useState("");
 
     // Fetch Work Item Details
     const getWorkItemDetails = async (id) => {
         try {
             setStatus("Fetching work item details...");
+            console.log("Fetching work item details for ID >>", id);
+
             const res = await axios.get(
                 `https://dev.azure.com/${organization}/${project}/_apis/wit/workitems/${id}?api-version=7.1-preview.3&$expand=relations`,
                 { headers: { Authorization: auth } }
             );
+
+            console.log("Work item details >>", res.data);
             setStatus("Work item details fetched successfully.");
             return res.data;
         } catch (error) {
-            console.error("Error fetching work item details:", error);
+            console.error("Error fetching work item details >>", error);
             setStatus("Failed to fetch work item details.");
             throw error;
         }
     };
 
     // Create a New Work Item (Clone)
-    const createWorkItem = async (
-        fields,
-        parentId,
-        workItemType,
-        originalWorkItem
-    ) => {
+    const createWorkItem = async (fields, parentId, workItemType) => {
         try {
             setStatus("Creating new work item...");
             const encodedWorkItemType = encodeURIComponent(workItemType);
 
-            const payload = [];
-            Object.entries(fields).forEach(([key, value]) => {
-                if (value) {
-                    payload.push({
-                        op: "add",
-                        path: `/fields/${key}`,
-                        value,
-                    });
-                }
-            });
+            console.log("Creating new work item with type >>", workItemType);
+            console.log("Fields to copy >>", fields);
+            console.log("Parent ID >>", parentId);
+
+            const payload = Object.entries(fields)
+                .filter(([_, value]) => value !== null && value !== undefined)
+                .map(([key, value]) => ({
+                    op: "add",
+                    path: `/fields/${key}`,
+                    value,
+                }));
 
             // Add Parent-Child Relationship
             if (parentId) {
@@ -61,6 +61,8 @@ const Playground5 = ({ workItemId }) => {
                 });
             }
 
+            console.log("Payload for new work item >>", payload);
+
             const res = await axios.post(
                 `https://dev.azure.com/${organization}/${project}/_apis/wit/workitems/$${encodedWorkItemType}?api-version=7.1-preview.3`,
                 payload,
@@ -72,12 +74,16 @@ const Playground5 = ({ workItemId }) => {
                 }
             );
 
+            console.log("New work item created successfully >>", res.data);
             setStatus(
                 `New work item created successfully with ID ${res.data.id}.`
             );
             return res.data;
         } catch (error) {
-            console.error("Error creating new work item:", error);
+            console.error("Error creating new work item >>", error);
+            if (error.response) {
+                console.error("Error response data >>", error.response.data);
+            }
             setStatus("Failed to create new work item.");
         }
     };
@@ -90,13 +96,15 @@ const Playground5 = ({ workItemId }) => {
         }
 
         try {
-            // Step 1: Fetch original work item details
+            console.log("Cloning work item ID >>", workItemId);
+
+            // Fetch original work item details
             const originalWorkItem = await getWorkItemDetails(workItemId);
 
-            // Step 2: Extract fields to copy
+            // Extract fields to copy
             const fieldsToCopy = {
                 "System.Title":
-                    originalWorkItem.fields["System.Title"] + " - Copy - PL5",
+                    originalWorkItem.fields["System.Title"] + " - Copy - PL6",
                 "System.Description":
                     originalWorkItem.fields["System.Description"] ||
                     "No description",
@@ -112,55 +120,23 @@ const Playground5 = ({ workItemId }) => {
                     originalWorkItem.fields["System.AssignedTo"] || "",
             };
 
-            // Step 3: Identify the work item type
+            console.log("Fields for cloned work item >>", fieldsToCopy);
+
             const workItemType = originalWorkItem.fields["System.WorkItemType"];
+            console.log("Work item type >>", workItemType);
 
-            // Step 4: Identify the parent (Feature Parent) of the backlog
-            const featureParentLink = originalWorkItem.relations?.find(
-                (relation) =>
-                    relation.rel === "System.LinkTypes.Hierarchy-Reverse"
-            );
-            const featureParentId = featureParentLink
-                ? parseInt(featureParentLink.url.split("/").pop(), 10)
-                : null;
-
-            // Step 5: Create a new Work Item (cloned backlog)
             const clonedBacklog = await createWorkItem(
                 fieldsToCopy,
                 null,
-                workItemType,
-                originalWorkItem
+                workItemType
             );
 
-            // Step 6: Link cloned backlog to the original feature parent
-            if (featureParentId) {
-                await axios.patch(
-                    `https://dev.azure.com/${organization}/${project}/_apis/wit/workitems/${clonedBacklog.id}?api-version=7.1-preview.3`,
-                    [
-                        {
-                            op: "add",
-                            path: "/relations/-",
-                            value: {
-                                rel: "System.LinkTypes.Hierarchy-Reverse",
-                                url: `https://dev.azure.com/${organization}/${project}/_apis/wit/workItems/${featureParentId}`,
-                                attributes: { isLocked: false, name: "Parent" },
-                            },
-                        },
-                    ],
-                    {
-                        headers: {
-                            "Content-Type": "application/json-patch+json",
-                            Authorization: auth,
-                        },
-                    }
-                );
-            }
-
-            // Step 7: Clone child tasks
+            // Clone child tasks
             const childLinks = originalWorkItem.relations?.filter(
                 (relation) =>
                     relation.rel === "System.LinkTypes.Hierarchy-Forward"
             );
+            console.log("Child links found >>", childLinks);
 
             if (childLinks && childLinks.length > 0) {
                 for (const childLink of childLinks) {
@@ -168,11 +144,13 @@ const Playground5 = ({ workItemId }) => {
                         childLink.url.split("/").pop(),
                         10
                     );
+                    console.log("Fetching child work item ID >>", childId);
+
                     const childTask = await getWorkItemDetails(childId);
 
                     const childFieldsToCopy = {
                         "System.Title":
-                            childTask.fields["System.Title"] + " - Copy",
+                            childTask.fields["System.Title"] + " - Copy - PL6",
                         "System.Description":
                             childTask.fields["System.Description"],
                         "System.AreaPath": childTask.fields["System.AreaPath"],
@@ -183,11 +161,15 @@ const Playground5 = ({ workItemId }) => {
                         "System.Tags": childTask.fields["System.Tags"],
                     };
 
+                    console.log(
+                        "Fields for cloned child work item >>",
+                        childFieldsToCopy
+                    );
+
                     await createWorkItem(
                         childFieldsToCopy,
                         clonedBacklog.id,
-                        childTask.fields["System.WorkItemType"],
-                        childTask
+                        childTask.fields["System.WorkItemType"]
                     );
                 }
                 setStatus("Cloned backlog and its tasks successfully!");
@@ -195,7 +177,7 @@ const Playground5 = ({ workItemId }) => {
                 setStatus("Cloned backlog successfully! No tasks to clone.");
             }
         } catch (error) {
-            console.error("Error cloning work item:", error);
+            console.error("Error cloning work item >>", error);
         }
     };
 
@@ -208,4 +190,4 @@ const Playground5 = ({ workItemId }) => {
     );
 };
 
-export default Playground5;
+export default Playground6;

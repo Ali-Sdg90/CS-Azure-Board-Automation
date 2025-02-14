@@ -124,7 +124,7 @@ const Playground4 = ({ workItemId }) => {
             // Step 2: Extract fields to copy and modify the title
             const fieldsToCopy = {
                 "System.Title": originalWorkItem.fields["System.Title"]
-                    ? originalWorkItem.fields["System.Title"] + " - Copy"
+                    ? originalWorkItem.fields["System.Title"] + " - Copy - PL4"
                     : "Default Title", // مقدار پیش‌فرض برای عنوان
                 "System.Description":
                     originalWorkItem.fields["System.Description"] || "ji",
