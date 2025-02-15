@@ -6,9 +6,62 @@ const organization = "cs-internship";
 const project = "CS Internship Program";
 const auth = `Basic ${btoa(`:${PAT_TOKEN}`)}`;
 
-const CopyMachine = ({ workItemId, sprintNumber }) => {
+const taskTitlePrefix = "[Siiiiib2] ";
+
+const CopyMachine = ({ workItemId, sprintNumber, copyName, btnIndex }) => {
     const [status, setStatus] = useState("");
     const [loading, setLoading] = useState(false);
+
+    const checkIfWorkItemExists = async (title) => {
+        try {
+            setStatus(`Checking if work item with title "${title}" exists...`);
+            console.log(
+                `Checking if work item with title "${title}" exists...`
+            );
+
+            const query = {
+                query: `SELECT [System.Id] FROM WorkItems WHERE [System.TeamProject] = @project AND [System.Title] = @title`,
+                parameters: {
+                    project: project,
+                    title: title,
+                },
+            };
+
+            console.log("Query:", query);
+
+            debugger;
+
+            const res = await axios.post(
+                `https://cors-anywhere.herokuapp.com/https://dev.azure.com/${organization}/_apis/wit/wiql?api-version=7.1-preview.3`, // حذف project از URL
+                query,
+                {
+                    headers: {
+                        "Content-Type": "application/json",
+                        Authorization: `Basic ${btoa(`:${PAT_TOKEN}`)}`, // بررسی صحیح بودن توکن
+                    },
+                }
+            );
+
+            console.log("Query result:", res.data);
+
+            if (res.data.workItems && res.data.workItems.length > 0) {
+                console.log(`Work item with title "${title}" already exists.`);
+                setStatus(
+                    `Error: Work item with title "${title}" already exists.`
+                );
+                return true;
+            }
+
+            return false;
+        } catch (error) {
+            console.error("Error checking for existing work item >>", error);
+            if (error.response) {
+                console.error("Error response data >>", error.response.data);
+            }
+            setStatus("Failed to check existing work item.");
+            return false;
+        }
+    };
 
     // Step 1: Fetch Work Item Details
     const getWorkItemDetails = async (id) => {
@@ -104,6 +157,16 @@ const CopyMachine = ({ workItemId, sprintNumber }) => {
 
             // Step 3.1: Fetch Original Work Item
             const originalWorkItem = await getWorkItemDetails(workItemId);
+
+            // // Check if work item created before
+            // const newTitle = createTitle(
+            //     originalWorkItem.fields["System.Title"]
+            // );
+            // const exists = await checkIfWorkItemExists(newTitle);
+            // if (exists) {
+            //     setLoading(false);
+            //     return;
+            // }
 
             // Step 3.2: Extract Fields to Copy
             const fieldsToCopy = {
@@ -315,17 +378,29 @@ const CopyMachine = ({ workItemId, sprintNumber }) => {
         let newTitle = originalTitle.replace(/\[Sprint No.\]/g, sprintNumber);
         newTitle = newTitle.replace(/\[TEMPLATE\] /g, "");
 
-        return newTitle;
+        return taskTitlePrefix + newTitle;
     };
 
     return (
-        <>
-            <h1>Status: {status}</h1>
-
-            <button onClick={handleCloneWorkItem} disabled={loading}>
-                {loading ? "Cloning..." : "Clone Work Item"}
+        <div
+            className={`copy-machine ${
+                status === "Cloned backlog and its tasks successfully!"
+                    ? "green-box"
+                    : status === "Failed to clone work item."
+                    ? "red-box"
+                    : ""
+            }`}
+        >
+            <h4>{createTitle(copyName)}</h4>
+            <button
+                onClick={handleCloneWorkItem}
+                className={`clone-btn${btnIndex}`}
+                disabled={loading}
+            >
+                Start
             </button>
-        </>
+            <div>Status: {status}</div>
+        </div>
     );
 };
 

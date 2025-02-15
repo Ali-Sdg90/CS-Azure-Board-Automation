@@ -1,44 +1,69 @@
-import React from "react";
-import UseCopy1 from "./test/UseCopy1";
-import Playground from "./test/Playground";
-import Playground2 from "./test/Playground2";
-import Playground3 from "./test/Playground3";
-import Playground4 from "./test/Playground4";
-import Playground5 from "./test/Playground5";
-import Playground6 from "./test/Playground6";
-import Playground7 from "./test/Playground7";
-import Playground8 from "./test/Playground8";
-import Playground9 from "./test/Playground9";
+import React, { useState } from "react";
 import CopyMachine from "./CopyMachine";
+import "./App.css";
 
 const App = () => {
-    const backlogsToCopy = [28939, 28894, 28945];
+    const backlogsToCopy = [
+        {
+            name: "[TEMPLATE] Team A (Mon. 19:00-20:00) Operational Meeting Participation [Sprint No.]",
+            id: 28939,
+        },
+        {
+            name: "[TEMPLATE] Hold Technical Sessions [Sprint No.]",
+            id: 28894,
+        },
+        {
+            name: "[TEMPLATE] Team A (Mon. 19:00-20:00) Operational Meeting Routine Tasks [Sprint No.]",
+            id: 28945,
+        },
+        {
+            name: "[TEMPLATE] Interns Coordination  [Sprint No.]",
+            id: 30022,
+        },
+        {
+            name: "[TEMPLATE] Communication/Coaching workshop [Sprint No.]: Mon (20:30-21:00) - [sessions no.]",
+            id: 30025,
+        },
+        {
+            name: "[TEMPLATE] Communication/Coaching workshop [Sprint No.]: Tue (15:00-15:30) - [sessions no.]",
+            id: 30028,
+        },
+        {
+            name: "[TEMPLATE] Communication/Coaching workshop  [Sprint No.]: Sat (15:00-15:30) - [sessions no.]",
+            id: 30031,
+        },
+        {
+            name: "[TEMPLATE] Q&A Session for [Step 1, Step 2, Step 3] - [Sun/Tue] - [Sprint No.]",
+            id: 28177,
+        },
+    ];
 
     const sprintNumber = 272;
 
-    const iterateOnListOfBacklogs = () => {
-        return backlogsToCopy.map((id) => (
-            <CopyMachine key={id} workItemId={id} sprintNumber={sprintNumber} />
-        ));
+    const handleCloneWorkItems = () => {
+        const btns = document.querySelectorAll('[class*="clone-btn"]');
+
+        btns.forEach((btn) => btn.click());
     };
 
     return (
         <div>
-            <h1>hi</h1>
-            {/* <UseCopy1 /> */}
-            {/* <Playground /> */}
-            {/* <Playground2 /> */}
-            {/* <Playground3 workItemId={28751} /> */}
-            {/* <Playground3 workItemId={28491} /> */}
-            {/* <Playground4 workItemId={28751} /> */}
-            {/* <Playground5 workItemId={28751} /> */}
-            {/* <Playground6 workItemId={28751} /> */}
-            {/* <Playground7 workItemId={28751} /> */}
-            {/* <Playground8 workItemId={28751} /> */}
-            {/* <Playground9 /> */}
-            {/* <CopyMachine workItemId={28894} sprintNumber={273} /> */}
+            <h1>- CS Azure Board Automation -</h1>
 
-            {iterateOnListOfBacklogs()}
+            <div className="copy-machines">
+                {backlogsToCopy.map((_, index) => (
+                    <CopyMachine
+                        key={index}
+                        workItemId={backlogsToCopy[index].id}
+                        sprintNumber={sprintNumber}
+                        copyName={backlogsToCopy[index].name}
+                        btnIndex={index}
+                    />
+                ))}
+            </div>
+            <div className="copy-machine start-all">
+                <button onClick={handleCloneWorkItems}>Start All</button>
+            </div>
         </div>
     );
 };
