@@ -6,7 +6,8 @@ const organization = "cs-internship";
 const project = "CS Internship Program";
 const auth = `Basic ${btoa(`:${PAT_TOKEN}`)}`;
 
-const taskTitlePrefix = "[Siiiiib2] ";
+// const taskTitlePrefix = "[Siiiiib2] ";
+const taskTitlePrefix = "";
 
 const CopyMachine = ({ workItemId, sprintNumber, copyName, btnIndex }) => {
     const [status, setStatus] = useState("");

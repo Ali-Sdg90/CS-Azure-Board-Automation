@@ -47,10 +47,13 @@ button {
 }
 
 .start-all {
-    margin-top: 10px;
+    display: flex;
+    justify-content: center;
     align-items: center;
 }
 
-.start-all button {
-    width: 120px;
+.start-all button{
+    font-size: 18px;
+    width: 110px;
+    height: 40px;
 }
