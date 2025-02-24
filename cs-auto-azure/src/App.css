@@ -9,9 +9,15 @@ body {
     padding: 30px;
 }
 
-.copy-machines {
+.copy-machines-operational {
     display: grid;
     grid-template-columns: 1fr 1fr;
+    gap: 10px;
+}
+
+.copy-machines-governance {
+    display: grid;
+    grid-template-columns: 1fr;
     gap: 10px;
 }
 
@@ -36,6 +42,7 @@ button {
     height: 25px;
     border-radius: 3px;
     border: 1px solid black;
+    cursor: pointer;
 }
 
 .green-box {
@@ -52,8 +59,26 @@ button {
     align-items: center;
 }
 
-.start-all button{
+.start-all button {
     font-size: 18px;
     width: 110px;
     height: 40px;
+}
+
+.mode-selection {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    margin: 20px 0 30px;
+}
+
+.mode-selection button {
+    width: 200px;
+    background: rgb(74, 74, 74);
+    opacity: 0.5;
+}
+
+.active-mode {
+    background: rgb(121, 226, 255) !important;
+    opacity: 1 !important;
 }

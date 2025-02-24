@@ -9,7 +9,13 @@ const auth = `Basic ${btoa(`:${PAT_TOKEN}`)}`;
 // const taskTitlePrefix = "[Siiiiib2] ";
 const taskTitlePrefix = "";
 
-const CopyMachine = ({ workItemId, sprintNumber, copyName, btnIndex }) => {
+const CopyMachine = ({
+    workItemId,
+    sprintNumber,
+    copyName,
+    btnIndex,
+    copyMode,
+}) => {
     const [status, setStatus] = useState("");
     const [loading, setLoading] = useState(false);
 
@@ -181,7 +187,9 @@ const CopyMachine = ({ workItemId, sprintNumber, copyName, btnIndex }) => {
                     originalWorkItem.fields["System.AreaPath"] || "",
                 "System.IterationPath":
                     originalWorkItem.fields["System.IterationPath"] +
-                        `\\Sprint O-${sprintNumber}` || "",
+                        `\\Sprint ${
+                            copyMode === "operational" ? "O" : "G"
+                        }-${sprintNumber}` || "",
                 "Microsoft.VSTS.Common.Priority":
                     originalWorkItem.fields["Microsoft.VSTS.Common.Priority"] ||
                     2,
@@ -344,7 +352,9 @@ const CopyMachine = ({ workItemId, sprintNumber, copyName, btnIndex }) => {
                         "System.AreaPath": childTask.fields["System.AreaPath"],
                         "System.IterationPath":
                             childTask.fields["System.IterationPath"] +
-                            `\\Sprint O-${sprintNumber}`,
+                            `\\Sprint ${
+                                copyMode === "operational" ? "O" : "G"
+                            }-${sprintNumber}`,
                         "Microsoft.VSTS.Common.Priority":
                             childTask.fields["Microsoft.VSTS.Common.Priority"],
                         "System.Tags": childTask.fields["System.Tags"],

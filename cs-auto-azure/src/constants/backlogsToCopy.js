@@ -1,4 +1,4 @@
-// Test Backlogs
+//  Operational Backlogs - Test
 // export const backlogsToCopy = [
 //     {
 //         name: "[TEMPLATE] Team A (Mon. 19:00-20:00) Operational Meeting Participation [Sprint No.]",
@@ -34,8 +34,8 @@
 //     },
 // ];
 
-// Real Backlogs
-export const backlogsToCopy = [
+// Operational Backlogs - Real
+export const OperationalBacklogs = [
     {
         name: "[TEMPLATE] Team A (Mon. 19:00-20:00) Operational Meeting Participation [Sprint No.]",
         id: 11681,
@@ -71,5 +71,29 @@ export const backlogsToCopy = [
     {
         name: "[TEMPLATE] Q&A Session for [Intro 1, Intro 2, Intro 3] - Sun - [Sprint No.]",
         id: 28403,
+    },
+];
+
+// Governance Backlogs - Test
+// export const GovernanceBacklogs = [
+//     {
+//         name: "[TEMPLATE] Governance Meeting Participation [Sprint No.]",
+//         id: 30934,
+//     },
+//     {
+//         name: "[TEMPLATE] Governance Meeting Routine Tasks [Sprint No.]",
+//         id: 30937,
+//     },
+// ];
+
+// Governance Backlogs - Real
+export const GovernanceBacklogs = [
+    {
+        name: "[TEMPLATE] Governance Meeting Participation [Sprint No.]",
+        id: 2648,
+    },
+    {
+        name: "[TEMPLATE] Governance Meeting Routine Tasks [Sprint No.]",
+        id: 16881,
     },
 ];
