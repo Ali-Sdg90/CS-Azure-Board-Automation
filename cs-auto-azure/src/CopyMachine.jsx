@@ -360,6 +360,10 @@ const CopyMachine = ({
                         "System.Tags": childTask.fields["System.Tags"],
                         "System.AssignedTo":
                             childTask.fields["System.AssignedTo"],
+                        "Microsoft.VSTS.Scheduling.RemainingWork":
+                            childTask.fields[
+                                "Microsoft.VSTS.Scheduling.RemainingWork"
+                            ],
                     };
 
                     console.log(
