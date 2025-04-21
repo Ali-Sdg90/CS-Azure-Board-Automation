@@ -1,20 +1,24 @@
 import React, { useState } from "react";
-import CopyMachine from "./CopyMachine";
+import CopyMachine from "./components/CopyMachine";
 import "./App.css";
 import {
     GovernanceBacklogs,
     OperationalBacklogs,
 } from "./constants/backlogsToCopy";
 
+import CapacityCopier from "./components/CapacityCopier";
+import IterationCopier from "./components/IterationCopier";
+
 const App = () => {
-    const operationalSprintNumber = 279; // Change Me :P
+    // const operationalSprintNumber = 285; // Change Me :P
+    const operationalSprintNumber = 282; // Change Me :P
 
     const [copyMode, setCopyMode] = useState("operational");
 
     const handleCloneWorkItems = () => {
-        const btns = document.querySelectorAll('[class*="clone-btn"]');
-
-        btns.forEach((btn) => btn.click());
+        // const btns = document.querySelectorAll('[class*="clone-btn"]');
+        //
+        // btns.forEach((btn) => btn.click());
     };
 
     return (
@@ -58,6 +62,14 @@ const App = () => {
                               copyMode={copyMode}
                           />
                       ))}
+
+                <CapacityCopier
+                    sprintNumber={operationalSprintNumber}
+                    copyName={"Operational Capacity"}
+                    copyMode={copyMode}
+                />
+
+                <IterationCopier />
 
                 <div className="copy-machine start-all">
                     <button onClick={handleCloneWorkItems}>Start All</button>
