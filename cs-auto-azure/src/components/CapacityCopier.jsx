@@ -80,37 +80,170 @@ const CapacityCopier = ({
             ],
         };
 
-        for (const capacity of capacities) {
-            const { teamMember, activities } = capacity;
-            try {
-                console.log(newId, teamMember.id, activities);
+        console.log("capacities >>", capacities);
+        // debugger;
 
-                console.log("organization:", organization);
-                console.log("project:", project);
-                console.log("newId:", newId);
-                console.log("teamMember.id:", teamMember.id);
+        const descriptorRes = await axios.get(
+            `https://vssps.dev.azure.com/${organization}/_apis/graph/users?api-version=7.1-preview.1`,
+            { headers: { Authorization: auth } }
+        );
 
-                debugger;
+        console.log("descriptorRes >>", descriptorRes.data.value);
+        // debugger;
 
-                await axios.patch(
-                    `https://dev.azure.com/${organization}/${project}/_apis/work/teamsettings/iterations/${newId}/capacities/${encodeURIComponent(
-                        teamMember.id
-                    )}?api-version=7.1-preview.1`,
-                    updatedCapacity,
-                    { headers: { Authorization: auth } }
-                );
-                successful.push(teamMember.displayName);
+        const mentorsDescriptor = descriptorRes.data.value
+            .filter((user) =>
+                capacities.some(
+                    (capacity) =>
+                        user.mailAddress === capacity.teamMember.uniqueName
+                )
+            )
+            .map((user) => {
+                console.log("user >>", user.mailAddress, user.descriptor);
+                return {
+                    email: user.mailAddress,
+                    descriptor: user.descriptor,
+                };
+            });
 
-                console.log(capacity);
-                debugger;
-            } catch (error) {
-                console.error(
-                    `Error applying capacity for ${teamMember.displayName}`,
-                    error
-                );
-                failed.push(teamMember.displayName);
+        console.log("descriptorRes >>", mentorsDescriptor);
+        // debugger;
+
+        // for (const capacity of capacities) {
+        //     const { teamMember, activities } = capacity;
+        //     try {
+        //         console.log(newId, teamMember.id, activities);
+
+        //         console.log("organization:", organization);
+        //         console.log("project:", project);
+        //         console.log("newId:", newId);
+        //         console.log("teamMember.id:", teamMember.id);
+
+        //         debugger;
+
+        //         await axios.patch(
+        //             `https://dev.azure.com/${organization}/${project}/_apis/work/teamsettings/iterations/${newId}/capacities/${encodeURIComponent(
+        //                 teamMember.id
+        //             )}?api-version=7.1-preview.1`,
+        //             updatedCapacity,
+        //             { headers: { Authorization: auth } }
+        //         );
+        //         successful.push(teamMember.displayName);
+
+        //         console.log(capacity);
+        //         debugger;
+        //     } catch (error) {
+        //         console.error(
+        //             `Error applying capacity for ${teamMember.displayName}`,
+        //             error
+        //         );
+        //         failed.push(teamMember.displayName);
+        //     }
+        // }
+
+        // const res = await axios.put(
+        //     `https://dev.azure.com/${organization}/${project}/_apis/work/teamsettings/iterations/${newId}/capacities?api-version=7.1-preview.1`,
+        //     testData,
+        //     { headers: { Authorization: auth } }
+        // );
+
+        // console.log("res >>", res);
+        // debugger;
+
+        // const res = await axios.put(
+        //     `https://dev.azure.com/${organization}/${project}/_apis/work/teamsettings/iterations/${newId}/capacities/${"aad.NGQyNzA3ZTctOThiOS03M2MzLWFhNDUtNWE2NGM5YjBjNDZi"}?api-version=7.1-preview.1`,
+        //     {
+        //         activities: [{ name: "Development", capacityPerDay: 6 }],
+        //         daysOff: [],
+        //     },
+        //     {
+        //         headers: {
+        //             Authorization: auth,
+        //             "Content-Type": "application/json",
+        //             Accept: "application/json",
+        //         },
+        //     }
+        // );
+
+        const res2 = await axios.get(
+            `https://dev.azure.com/${organization}/_apis/projects/${project}/teams?api-version=6.0`,
+            {
+                headers: {
+                    Authorization: auth,
+                    "Content-Type": "application/json",
+                    Accept: "application/json",
+                },
             }
-        }
+        );
+
+        // const getResponse = await axios.get(
+        //     `https://dev.azure.com/${organization}/${project}/Operations%20Team/_apis/work/teamsettings/iterations/${newId}/capacities?api-version=6.0`,
+        //     {
+        //         headers: { Authorization: auth },
+        //     }
+        // );
+
+        // console.log("getResponse >>", getResponse.data.value);
+        // debugger;
+
+        console.log(res2);
+
+        // "5b3792d4-b9f5-6cb5-bfe2-a970dffc316c"
+        // "aad.OTFmM2YyYjgtNTlkZC03YmMwLTlmN2EtNDNhYzE0NTgyZjQx"
+
+        // const res = await axios.put(
+        //     `https://dev.azure.com/${organization}/${project}/${"Operations%20Team"}/_apis/work/teamsettings/iterations/${newId}/capacities/${"5b3792d4-b9f5-6cb5-bfe2-a970dffc316c"}?api-version=6.0`,
+        //     {
+        //         activities: [{ name: "Development", capacityPerDay: 6 }],
+        //         daysOff: [],
+        //     },
+        //     {
+        //         headers: {
+        //             Authorization: auth,
+        //             "Content-Type": "application/json",
+        //             Accept: "application/json",
+        //         },
+        //     }
+        // );
+
+        const teamMemberId =
+            "5b3792d4-b9f5-6cb5-bfe2-a970dffc316c";
+
+        const team = "eb6410f4-b1e0-46cc-a449-af3ac986987c"; // Operational
+        // const team = "7200928e-1d9b-4ede-9102-ba97d17fde4f"; // Governance
+
+        console.log("organization >>", organization);
+        console.log("project >>", project);
+        console.log("team >>", team);
+        console.log("newId >>", newId);
+        console.log("teamMemberId >>", teamMemberId);
+
+        const res = await axios.patch(
+            `https://dev.azure.com/${organization}/${project}/${team}/_apis/work/teamsettings/iterations/${newId}/capacities/${teamMemberId}?api-version=6.0`,
+            {
+                activities: [
+                    {
+                        capacityPerDay: 5,
+                        name: "Design",
+                    },
+                    {
+                        capacityPerDay: 5,
+                        name: "Development",
+                    },
+                ],
+                daysOff: [],
+            },
+            {
+                headers: {
+                    Authorization: auth,
+                    "Content-Type": "application/json",
+                    Accept: "application/json",
+                },
+            }
+        );
+
+        console.log("res >>", res);
+        // debugger;
 
         setCopiedUsers(successful);
         setFailedUsers(failed);
