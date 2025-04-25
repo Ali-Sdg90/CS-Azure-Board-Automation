@@ -1,19 +1,36 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import CopyMachine from "./components/CopyMachine";
 import "./App.css";
 import {
     GovernanceBacklogs,
     OperationalBacklogs,
 } from "./constants/backlogsToCopy";
+import { PAT_TOKEN } from "./constants/patToken";
 
 import CapacityCopier from "./components/CapacityCopier";
 import IterationCopier from "./components/IterationCopier";
+
+const organization = "cs-internship";
+const project = "CS Internship Program";
+const auth = `Basic ${btoa(`:${PAT_TOKEN}`)}`;
 
 const App = () => {
     // const operationalSprintNumber = 285; // Change Me :P
     const operationalSprintNumber = 282; // Change Me :P
 
     const [copyMode, setCopyMode] = useState("operational");
+
+    const [teamID, setTeamID] = useState(
+        "eb6410f4-b1e0-46cc-a449-af3ac986987c"
+    ); // Operational
+
+    useEffect(() => {
+        if (copyMode === "operational") {
+            setTeamID("eb6410f4-b1e0-46cc-a449-af3ac986987c");
+        } else if (copyMode === "governance") {
+            setTeamID("f1b0c3a2-4d7e-4a5b-8f6c-9d0e2f3b1c5d");
+        }
+    }, [copyMode]);
 
     const handleCloneWorkItems = () => {
         // const btns = document.querySelectorAll('[class*="clone-btn"]');
@@ -64,16 +81,31 @@ const App = () => {
                       ))}
 
                 <CapacityCopier
-                    teamId={"Operations Team"}
-                    sprintNumber={operationalSprintNumber}
+                    sprintNumber={
+                        copyMode === "operational"
+                            ? operationalSprintNumber
+                            : operationalSprintNumber + 10
+                    }
                     copyName={"Operational Capacity"}
                     copyMode={copyMode}
+                    auth={auth}
+                    organization={organization}
+                    project={project}
+                    teamID={teamID}
                 />
 
                 <IterationCopier
-                    sprintNumber={300}
+                    sprintNumber={
+                        copyMode === "operational"
+                            ? operationalSprintNumber
+                            : operationalSprintNumber + 10
+                    }
                     copyName={"Operational Iteration"}
                     copyMode={copyMode}
+                    auth={auth}
+                    organization={organization}
+                    project={project}
+                    teamID={teamID}
                 />
 
                 <div className="copy-machine start-all">

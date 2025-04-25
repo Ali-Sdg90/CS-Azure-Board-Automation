@@ -1,19 +1,26 @@
 import React, { useState } from "react";
 import axios from "axios";
-import { PAT_TOKEN } from "../constants/patToken";
 
-const organization = "cs-internship";
-const project = "CS Internship Program";
-const auth = `Basic ${btoa(`:${PAT_TOKEN}`)}`;
-
-const CapacityCopier = ({ teamId, sprintNumber, copyName, copyMode }) => {
+const CapacityCopier = ({
+    sprintNumber,
+    copyName,
+    copyMode,
+    organization,
+    project,
+    auth,
+    teamID,
+}) => {
     const [status, setStatus] = useState("");
     const [loading, setLoading] = useState(false);
 
     // Get All Iterations for the Team
     const fetchTeamIterations = async () => {
         const res = await axios.get(
-            `https://dev.azure.com/${organization}/${project}/${teamId}/_apis/work/teamsettings/iterations?api-version=7.1-preview.1`,
+            `https://dev.azure.com/${organization}/${project}/${
+                copyMode === "operational"
+                    ? "Operations Team"
+                    : "Governance Team"
+            }/_apis/work/teamsettings/iterations?api-version=7.1-preview.1`,
             { headers: { Authorization: auth } }
         );
 
@@ -44,7 +51,11 @@ const CapacityCopier = ({ teamId, sprintNumber, copyName, copyMode }) => {
             setStatus("Fetching capacities from previous sprint...");
 
             const res = await axios.get(
-                `https://dev.azure.com/${organization}/${project}/${teamId}/_apis/work/teamsettings/iterations/${prevId}/capacities?api-version=7.1-preview.1`,
+                `https://dev.azure.com/${organization}/${project}/${
+                    copyMode === "operational"
+                        ? "Operations Team"
+                        : "Governance Team"
+                }/_apis/work/teamsettings/iterations/${prevId}/capacities?api-version=7.1-preview.1`,
                 { headers: { Authorization: auth } }
             );
 
@@ -64,12 +75,13 @@ const CapacityCopier = ({ teamId, sprintNumber, copyName, copyMode }) => {
 
         setStatus("Applying capacities to new sprint...");
 
-        const team = "eb6410f4-b1e0-46cc-a449-af3ac986987c"; // Operational
-        // const team = "7200928e-1d9b-4ede-9102-ba97d17fde4f"; // Governance
+        console.log(
+            `https://dev.azure.com/${organization}/_apis/projects/${project}/teams/${teamID}/members?api-version=6.0`
+        );
 
         // Get Team Members Data
         const memberData = await axios.get(
-            `https://dev.azure.com/${organization}/_apis/projects/${project}/teams/${team}/members?api-version=6.0`,
+            `https://dev.azure.com/${organization}/_apis/projects/${project}/teams/${teamID}/members?api-version=6.0`,
             {
                 headers: {
                     Authorization: auth,
@@ -79,7 +91,7 @@ const CapacityCopier = ({ teamId, sprintNumber, copyName, copyMode }) => {
             }
         );
 
-        console.log("teamIDs >>", memberData.data.value);
+        console.log("Members Data >>", memberData.data.value);
 
         // Extracting team member UUIDs from memberData and mapping to email
         const teamUUIDs = memberData.data.value.map((member) => ({
@@ -101,7 +113,7 @@ const CapacityCopier = ({ teamId, sprintNumber, copyName, copyMode }) => {
 
             try {
                 const res = await axios.patch(
-                    `https://dev.azure.com/${organization}/${project}/${team}/_apis/work/teamsettings/iterations/${newId}/capacities/${userId}?api-version=6.0`,
+                    `https://dev.azure.com/${organization}/${project}/${teamID}/_apis/work/teamsettings/iterations/${newId}/capacities/${userId}?api-version=6.0`,
                     {
                         activities: [
                             {
@@ -210,7 +222,9 @@ const CapacityCopier = ({ teamId, sprintNumber, copyName, copyMode }) => {
                     : ""
             }`}
         >
-            <h4>Copy Capacities for {copyName}</h4>
+            <h4>
+                Copy Capacities for {copyName} - {sprintNumber}
+            </h4>
             <button onClick={handleCopyCapacities} disabled={loading}>
                 Start
             </button>
