@@ -64,6 +64,7 @@ const App = () => {
                       ))}
 
                 <CapacityCopier
+                    teamId={"Operations Team"}
                     sprintNumber={operationalSprintNumber}
                     copyName={"Operational Capacity"}
                     copyMode={copyMode}

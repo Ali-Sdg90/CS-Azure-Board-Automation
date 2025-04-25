@@ -6,27 +6,22 @@ const organization = "cs-internship";
 const project = "CS Internship Program";
 const auth = `Basic ${btoa(`:${PAT_TOKEN}`)}`;
 
-const CapacityCopier = ({
-    teamId = "Operations Team",
-    sprintNumber,
-    copyName,
-    copyMode,
-}) => {
+const CapacityCopier = ({ teamId, sprintNumber, copyName, copyMode }) => {
     const [status, setStatus] = useState("");
     const [loading, setLoading] = useState(false);
-    const [copiedUsers, setCopiedUsers] = useState([]);
-    const [failedUsers, setFailedUsers] = useState([]);
 
+    // Get All Iterations for the Team
     const fetchTeamIterations = async () => {
-        console.log("iub");
         const res = await axios.get(
             `https://dev.azure.com/${organization}/${project}/${teamId}/_apis/work/teamsettings/iterations?api-version=7.1-preview.1`,
             { headers: { Authorization: auth } }
         );
+
         console.log("Fetched iterations:", res);
         return res.data.value;
     };
 
+    // Find the iteration ID by sprint number (Example: Sprint O-282)
     const findIterationIdBySprintNumber = (iterations, sprintNumber, mode) => {
         const label = mode === "operational" ? "O" : "G";
         const targetName = `Sprint ${label}-${sprintNumber}`;
@@ -43,17 +38,16 @@ const CapacityCopier = ({
         return match ? match.id : null;
     };
 
+    // Get Capacities from Previous Sprint
     const getCapacitiesFromPreviousSprint = async (prevId) => {
         try {
             setStatus("Fetching capacities from previous sprint...");
-            console.log("1");
+
             const res = await axios.get(
                 `https://dev.azure.com/${organization}/${project}/${teamId}/_apis/work/teamsettings/iterations/${prevId}/capacities?api-version=7.1-preview.1`,
                 { headers: { Authorization: auth } }
             );
 
-            console.log("2");
-            console.log(res.data.value);
             return res.data.value;
         } catch (error) {
             console.error("Error fetching previous sprint capacities", error);
@@ -62,43 +56,18 @@ const CapacityCopier = ({
         }
     };
 
+    // Apply Capacities to New Sprint
+    // Get new iteration ID and previes sprint capacities to apply capacities to the new sprint
     const applyCapacitiesToNewSprint = async (newId, capacities) => {
-        console.log("3");
-        console.log(newId, capacities);
-
         const successful = [];
         const failed = [];
 
         setStatus("Applying capacities to new sprint...");
 
-        // const descriptorRes = await axios.get(
-        //     `https://vssps.dev.azure.com/${organization}/_apis/graph/users?api-version=7.1-preview.1`,
-        //     { headers: { Authorization: auth } }
-        // );
-
-        // console.log("descriptorRes >>", descriptorRes.data.value);
-        // // debugger;
-
-        // const mentorsDescriptor = descriptorRes.data.value
-        //     .filter((user) =>
-        //         capacities.some(
-        //             (capacity) =>
-        //                 user.mailAddress === capacity.teamMember.uniqueName
-        //         )
-        //     )
-        //     .map((user) => {
-        //         console.log("user >>", user.mailAddress, user.descriptor);
-        //         return {
-        //             email: user.mailAddress,
-        //             descriptor: user.descriptor,
-        //         };
-        //     });
-
-        // console.log("descriptorRes >>", mentorsDescriptor);
-
         const team = "eb6410f4-b1e0-46cc-a449-af3ac986987c"; // Operational
         // const team = "7200928e-1d9b-4ede-9102-ba97d17fde4f"; // Governance
 
+        // Get Team Members Data
         const memberData = await axios.get(
             `https://dev.azure.com/${organization}/_apis/projects/${project}/teams/${team}/members?api-version=6.0`,
             {
@@ -112,6 +81,7 @@ const CapacityCopier = ({
 
         console.log("teamIDs >>", memberData.data.value);
 
+        // Extracting team member UUIDs from memberData and mapping to email
         const teamUUIDs = memberData.data.value.map((member) => ({
             email: member.identity.uniqueName,
             id: member.identity.id,
@@ -119,6 +89,7 @@ const CapacityCopier = ({
 
         console.log("teamUUIDs >>", teamUUIDs);
 
+        // Loop through each member and update it for the new sprint
         for (const capacity of capacities) {
             const userEmail = capacity.teamMember.uniqueName;
 
@@ -134,8 +105,11 @@ const CapacityCopier = ({
                     {
                         activities: [
                             {
-                                capacityPerDay: 1,
-                                name: "Development",
+                                capacityPerDay: capacities.find(
+                                    (capacity) =>
+                                        capacity.teamMember.uniqueName ===
+                                        userEmail
+                                )?.activities[0]?.capacityPerDay,
                             },
                         ],
                         daysOff: [],
@@ -150,54 +124,22 @@ const CapacityCopier = ({
                 );
 
                 console.log(
-                    "resssss >>",
+                    "Updated Capacity >>",
                     res.data.teamMember.displayName,
                     res.data.activities[0].capacityPerDay
                 );
+
+                successful.push(userEmail);
             } catch (err) {
                 console.error(
                     "error updating capacity for",
                     userEmail,
                     err.response?.data || err.message
                 );
+
+                failed.push(userEmail);
             }
         }
-
-        // console.log("organization >>", organization);
-        // console.log("project >>", project);
-        // console.log("team >>", team);
-        // console.log("newId >>", newId);
-        // console.log("teamMemberId >>", teamMemberId);
-
-        // const res = await axios.patch(
-        //     `https://dev.azure.com/${organization}/${project}/${team}/_apis/work/teamsettings/iterations/${newId}/capacities/${teamMemberId}?api-version=6.0`,
-        //     {
-        //         activities: [
-        //             {
-        //                 capacityPerDay: 5,
-        //                 name: "Design",
-        //             },
-        //             {
-        //                 capacityPerDay: 5,
-        //                 name: "Development",
-        //             },
-        //         ],
-        //         daysOff: [],
-        //     },
-        //     {
-        //         headers: {
-        //             Authorization: auth,
-        //             "Content-Type": "application/json",
-        //             Accept: "application/json",
-        //         },
-        //     }
-        // );
-
-        // console.log("res >>", res);
-        // // debugger;
-
-        setCopiedUsers(successful);
-        setFailedUsers(failed);
 
         if (successful.length && !failed.length) {
             setStatus("All capacities copied successfully.");
@@ -208,6 +150,7 @@ const CapacityCopier = ({
         }
     };
 
+    // Handle Copy Capacities
     const handleCopyCapacities = async () => {
         setLoading(true);
         setStatus("Starting capacity copy process...");
@@ -247,6 +190,7 @@ const CapacityCopier = ({
                 return;
             }
 
+            // Send new iteration ID and previes sprint capacities to apply capacities to the new sprint
             await applyCapacitiesToNewSprint(newIterationId, prevCapacities);
         } catch (error) {
             console.error("Unexpected error:", error);
@@ -266,7 +210,7 @@ const CapacityCopier = ({
                     : ""
             }`}
         >
-            <h3>Copy Capacities for {copyName}</h3>
+            <h4>Copy Capacities for {copyName}</h4>
             <button onClick={handleCopyCapacities} disabled={loading}>
                 Start
             </button>
