@@ -19,57 +19,6 @@ const CopyMachine = ({
     const [status, setStatus] = useState("");
     const [loading, setLoading] = useState(false);
 
-    // const checkIfWorkItemExists = async (title) => {
-    //     try {
-    //         setStatus(`Checking if work item with title "${title}" exists...`);
-    //         console.log(
-    //             `Checking if work item with title "${title}" exists...`
-    //         );
-
-    //         const query = {
-    //             query: `SELECT [System.Id] FROM WorkItems WHERE [System.TeamProject] = @project AND [System.Title] = @title`,
-    //             parameters: {
-    //                 project: project,
-    //                 title: title,
-    //             },
-    //         };
-
-    //         console.log("Query:", query);
-
-    //         debugger;
-
-    //         const res = await axios.post(
-    //             `https://cors-anywhere.herokuapp.com/https://dev.azure.com/${organization}/_apis/wit/wiql?api-version=7.1-preview.3`, // حذف project از URL
-    //             query,
-    //             {
-    //                 headers: {
-    //                     "Content-Type": "application/json",
-    //                     Authorization: `Basic ${btoa(`:${PAT_TOKEN}`)}`,
-    //                 },
-    //             }
-    //         );
-
-    //         console.log("Query result:", res.data);
-
-    //         if (res.data.workItems && res.data.workItems.length > 0) {
-    //             console.log(`Work item with title "${title}" already exists.`);
-    //             setStatus(
-    //                 `Error: Work item with title "${title}" already exists.`
-    //             );
-    //             return true;
-    //         }
-
-    //         return false;
-    //     } catch (error) {
-    //         console.error("Error checking for existing work item >>", error);
-    //         if (error.response) {
-    //             console.error("Error response data >>", error.response.data);
-    //         }
-    //         setStatus("Failed to check existing work item.");
-    //         return false;
-    //     }
-    // };
-
     // Step 1: Fetch Work Item Details
     const getWorkItemDetails = async (id) => {
         try {
@@ -164,16 +113,6 @@ const CopyMachine = ({
 
             // Step 3.1: Fetch Original Work Item
             const originalWorkItem = await getWorkItemDetails(workItemId);
-
-            // // Check if work item created before
-            // const newTitle = createTitle(
-            //     originalWorkItem.fields["System.Title"]
-            // );
-            // const exists = await checkIfWorkItemExists(newTitle);
-            // if (exists) {
-            //     setLoading(false);
-            //     return;
-            // }
 
             // Step 3.2: Extract Fields to Copy
             const fieldsToCopy = {

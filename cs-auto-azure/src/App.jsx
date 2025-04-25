@@ -70,7 +70,11 @@ const App = () => {
                     copyMode={copyMode}
                 />
 
-                <IterationCopier />
+                <IterationCopier
+                    sprintNumber={300}
+                    copyName={"Operational Iteration"}
+                    copyMode={copyMode}
+                />
 
                 <div className="copy-machine start-all">
                     <button onClick={handleCloneWorkItems}>Start All</button>
