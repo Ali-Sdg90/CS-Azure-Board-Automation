@@ -15,10 +15,11 @@ const project = "CS Internship Program";
 const auth = `Basic ${btoa(`:${PAT_TOKEN}`)}`;
 
 const App = () => {
-    // const operationalSprintNumber = 285; // Change Me :P
-    const operationalSprintNumber = 282; // Change Me :P
+    const operationalSprintNumber = 289; // Change Me :P
 
     const [copyMode, setCopyMode] = useState("operational");
+    const [isOkToCopy, setIsOkToCopy] = useState("load");
+    const [isCopyAll, setIsCopyAll] = useState(false);
 
     const [teamID, setTeamID] = useState(
         "eb6410f4-b1e0-46cc-a449-af3ac986987c"
@@ -33,10 +34,24 @@ const App = () => {
     }, [copyMode]);
 
     const handleCloneWorkItems = () => {
-        // const btns = document.querySelectorAll('[class*="clone-btn"]');
-        //
-        // btns.forEach((btn) => btn.click());
+        setIsCopyAll(true);
+        const iterationBtn = document.querySelector(".clone-iteration");
+        iterationBtn.click();
     };
+
+    useEffect(() => {
+        if (isOkToCopy !== "load" && isCopyAll) {
+            if (isOkToCopy === "ok") {
+                const btns = document.querySelectorAll('[class*="clone-btn"]');
+                btns.forEach((btn) => btn.click());
+            } else if (isOkToCopy === "duplicate") {
+                alert(
+                    "The selected iteration has already been copied. Please change the iteration number and click the Start button again."
+                );
+            }
+            setIsCopyAll(false);
+        }
+    }, [isOkToCopy]);
 
     return (
         <div>
@@ -97,8 +112,8 @@ const App = () => {
                 <IterationCopier
                     sprintNumber={
                         copyMode === "operational"
-                            ? operationalSprintNumber
-                            : operationalSprintNumber + 10
+                            ? operationalSprintNumber + 1
+                            : operationalSprintNumber + 11
                     }
                     copyName={"Operational Iteration"}
                     copyMode={copyMode}
@@ -106,6 +121,7 @@ const App = () => {
                     organization={organization}
                     project={project}
                     teamID={teamID}
+                    setIsOkToCopy={setIsOkToCopy}
                 />
 
                 <div className="copy-machine start-all">

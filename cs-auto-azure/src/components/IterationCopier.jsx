@@ -7,7 +7,12 @@ const project = "CS Internship Program";
 const auth = `Basic ${btoa(`:${PAT_TOKEN}`)}`;
 const team = "eb6410f4-b1e0-46cc-a449-af3ac986987c"; // Operational
 
-const IterationCreator = ({ sprintNumber, copyName, copyMode }) => {
+const IterationCreator = ({
+    sprintNumber,
+    copyName,
+    copyMode,
+    setIsOkToCopy,
+}) => {
     const [status, setStatus] = useState("");
     const [loading, setLoading] = useState(false);
 
@@ -128,6 +133,8 @@ const IterationCreator = ({ sprintNumber, copyName, copyMode }) => {
             setStatus(
                 `Iteration '${iterationName}' created and added to team successfully.`
             );
+
+            setIsOkToCopy("ok");
         } catch (error) {
             console.error(
                 "Error creating iteration:",
@@ -138,6 +145,8 @@ const IterationCreator = ({ sprintNumber, copyName, copyMode }) => {
                     error.response?.data?.message || error.message
                 }`
             );
+
+            setIsOkToCopy("duplicate");
         }
 
         setLoading(false);
@@ -154,9 +163,13 @@ const IterationCreator = ({ sprintNumber, copyName, copyMode }) => {
             }`}
         >
             <h4>
-                Create {copyName} - {sprintNumber}
+                Create {copyName} - [{sprintNumber - 1} + 1]
             </h4>
-            <button onClick={createIteration} disabled={loading}>
+            <button
+                onClick={createIteration}
+                className={`clone-iteration`}
+                disabled={loading}
+            >
                 Start
             </button>
             <p>Status: {status}</p>

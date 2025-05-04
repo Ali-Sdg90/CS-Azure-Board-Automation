@@ -225,7 +225,11 @@ const CapacityCopier = ({
             <h4>
                 Copy Capacities for {copyName} - {sprintNumber}
             </h4>
-            <button onClick={handleCopyCapacities} disabled={loading}>
+            <button
+                onClick={handleCopyCapacities}
+                className={`clone-btn-capacity`}
+                disabled={loading}
+            >
                 Start
             </button>
             <p>Status: {status}</p>
