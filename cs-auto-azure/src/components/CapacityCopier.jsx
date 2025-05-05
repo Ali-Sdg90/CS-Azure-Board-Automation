@@ -181,7 +181,7 @@ const CapacityCopier = ({
             );
 
             if (!prevIterationId || !newIterationId) {
-                setStatus("Could not find previous or current iteration ID.");
+                setStatus("error, could not find previous or current iteration ID.");
                 setLoading(false);
                 return;
             }

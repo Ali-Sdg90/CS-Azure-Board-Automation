@@ -9,6 +9,7 @@ import { PAT_TOKEN } from "./constants/patToken";
 
 import CapacityCopier from "./components/CapacityCopier";
 import IterationCopier from "./components/IterationCopier";
+import AzureDevOpsTeams from "./components/AzureDevOpsTeams";
 
 const organization = "cs-internship";
 const project = "CS Internship Program";
@@ -29,7 +30,7 @@ const App = () => {
         if (copyMode === "operational") {
             setTeamID("eb6410f4-b1e0-46cc-a449-af3ac986987c");
         } else if (copyMode === "governance") {
-            setTeamID("f1b0c3a2-4d7e-4a5b-8f6c-9d0e2f3b1c5d");
+            setTeamID("7200928e-1d9b-4ede-9102-ba97d17fde4f");
         }
     }, [copyMode]);
 
@@ -52,6 +53,8 @@ const App = () => {
             setIsCopyAll(false);
         }
     }, [isOkToCopy]);
+
+    // return <AzureDevOpsTeams />;
 
     return (
         <div>
@@ -101,7 +104,11 @@ const App = () => {
                             ? operationalSprintNumber
                             : operationalSprintNumber + 10
                     }
-                    copyName={"Operational Capacity"}
+                    copyName={
+                        copyMode === "operational"
+                            ? "Operational Capacity"
+                            : "Governance Capacity"
+                    }
                     copyMode={copyMode}
                     auth={auth}
                     organization={organization}
@@ -115,7 +122,11 @@ const App = () => {
                             ? operationalSprintNumber + 1
                             : operationalSprintNumber + 11
                     }
-                    copyName={"Operational Iteration"}
+                    copyName={
+                        copyMode === "operational"
+                            ? "Operational Iteration"
+                            : "Governance Iteration"
+                    }
                     copyMode={copyMode}
                     auth={auth}
                     organization={organization}

@@ -5,13 +5,13 @@ import { PAT_TOKEN } from "../constants/patToken";
 const organization = "cs-internship";
 const project = "CS Internship Program";
 const auth = `Basic ${btoa(`:${PAT_TOKEN}`)}`;
-const team = "eb6410f4-b1e0-46cc-a449-af3ac986987c"; // Operational
 
 const IterationCreator = ({
     sprintNumber,
     copyName,
     copyMode,
     setIsOkToCopy,
+    teamID,
 }) => {
     const [status, setStatus] = useState("");
     const [loading, setLoading] = useState(false);
@@ -19,7 +19,7 @@ const IterationCreator = ({
     const getLatestIterationEndDate = async () => {
         try {
             const res = await axios.get(
-                `https://dev.azure.com/${organization}/${project}/${team}/_apis/work/teamsettings/iterations?api-version=7.1`,
+                `https://dev.azure.com/${organization}/${project}/${teamID}/_apis/work/teamsettings/iterations?api-version=7.1`,
                 {
                     headers: {
                         Authorization: auth,
@@ -91,7 +91,9 @@ const IterationCreator = ({
             const createPathResponse = await axios.post(
                 `https://dev.azure.com/${organization}/${encodeURIComponent(
                     project
-                )}/_apis/wit/classificationnodes/iterations/${"Operational"}?api-version=7.1`,
+                )}/_apis/wit/classificationnodes/iterations/${
+                    copyMode === "operational" ? "Operational" : "Governance"
+                }?api-version=7.1`,
                 {
                     name: iterationName,
                     attributes: {
@@ -117,7 +119,7 @@ const IterationCreator = ({
             // Step 2: Add the iteration to the team
             setStatus("Adding iteration to team...");
             const addToTeamResponse = await axios.post(
-                `https://dev.azure.com/${organization}/${project}/${team}/_apis/work/teamsettings/iterations?api-version=7.1`,
+                `https://dev.azure.com/${organization}/${project}/${teamID}/_apis/work/teamsettings/iterations?api-version=7.1`,
                 {
                     id: newIterationId,
                 },

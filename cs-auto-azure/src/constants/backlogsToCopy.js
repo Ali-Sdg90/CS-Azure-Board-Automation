@@ -18,7 +18,7 @@ export const OperationalBacklogs = [
     },
     {
         name: "[TEMPLATE] Communication/Coaching workshop [Sprint No.]: Mon (20:30-21:00) - [sessions no.]",
-        id: 13182,
+        id: 32648,
     },
     {
         name: "[TEMPLATE] Communication/Coaching workshop [Sprint No.]: Tue (15:00-15:30) - [sessions no.]",
