@@ -16,7 +16,7 @@ const project = "CS Internship Program";
 const auth = `Basic ${btoa(`:${PAT_TOKEN}`)}`;
 
 const App = () => {
-    const operationalSprintNumber = 300; // Change Me :P
+    const operationalSprintNumber = 300; // Change Me :P 
 
     const [copyMode, setCopyMode] = useState("operational");
     const [isOkToCopy, setIsOkToCopy] = useState("load");
