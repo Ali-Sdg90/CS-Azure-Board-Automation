@@ -40,10 +40,16 @@ const IterationCreator = ({
                 );
 
             const latest = datedIterations[0];
-
             console.log("Latest iteration:", latest);
 
-            return latest?.attributes?.finishDate || null;
+            if (!latest?.attributes?.finishDate) return null;
+
+            const finishDate = new Date(latest.attributes.finishDate);
+            const oneDayAfter = new Date(
+                finishDate.getTime() + 24 * 60 * 60 * 1000
+            );
+
+            return oneDayAfter.toISOString();
         } catch (error) {
             console.error(
                 "Error fetching iterations:",
