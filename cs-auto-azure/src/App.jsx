@@ -10,13 +10,14 @@ import { PAT_TOKEN } from "./constants/patToken";
 import CapacityCopier from "./components/CapacityCopier";
 import IterationCopier from "./components/IterationCopier";
 import AzureDevOpsTeams from "./components/AzureDevOpsTeams";
+import Header from "./components/Header";
 
 const organization = "cs-internship";
 const project = "CS Internship Program";
 const auth = `Basic ${btoa(`:${PAT_TOKEN}`)}`;
 
 const App = () => {
-    const operationalSprintNumber = 300; // Change Me :P 
+    const [operationalSprintNumber, setOperationalSprintNumber] = useState(300); // Change Me :P
 
     const [copyMode, setCopyMode] = useState("operational");
     const [isOkToCopy, setIsOkToCopy] = useState("load");
@@ -58,7 +59,7 @@ const App = () => {
 
     return (
         <div>
-            <h1>- CS Azure Board Copy Machine -</h1>
+            <Header />
 
             <div className="mode-selection">
                 <button
@@ -75,11 +76,29 @@ const App = () => {
                 </button>
             </div>
 
+            <div className="sprint-number-control">
+                <button
+                    onClick={() =>
+                        setOperationalSprintNumber((prev) => prev - 1)
+                    }
+                >
+                    ◀
+                </button>
+                <span>{operationalSprintNumber}</span>
+                <button
+                    onClick={() =>
+                        setOperationalSprintNumber((prev) => prev + 1)
+                    }
+                >
+                    ▶
+                </button>
+            </div>
+
             <div className={`copy-machines-${copyMode}`}>
                 {copyMode === "operational"
                     ? OperationalBacklogs.map((backlog, index) => (
                           <CopyMachine
-                              key={index}
+                              key={`${index}-${operationalSprintNumber}`}
                               workItemId={backlog.id}
                               sprintNumber={operationalSprintNumber}
                               copyName={backlog.name}
@@ -89,7 +108,7 @@ const App = () => {
                       ))
                     : GovernanceBacklogs.map((backlog, index) => (
                           <CopyMachine
-                              key={index}
+                              key={`${index}-${operationalSprintNumber + 10}`}
                               workItemId={backlog.id}
                               sprintNumber={operationalSprintNumber + 10}
                               copyName={backlog.name}
@@ -99,6 +118,7 @@ const App = () => {
                       ))}
 
                 <CapacityCopier
+                    key={`capacity-${operationalSprintNumber}-${copyMode}`}
                     sprintNumber={
                         copyMode === "operational"
                             ? operationalSprintNumber
@@ -117,6 +137,7 @@ const App = () => {
                 />
 
                 <IterationCopier
+                    key={`iteration-${operationalSprintNumber}-${copyMode}`}
                     sprintNumber={
                         copyMode === "operational"
                             ? operationalSprintNumber + 1

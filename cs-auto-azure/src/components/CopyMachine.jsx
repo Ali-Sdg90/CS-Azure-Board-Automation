@@ -338,10 +338,10 @@ const CopyMachine = ({
     return (
         <div
             className={`copy-machine ${
-                status === "Cloned backlog and its tasks successfully!"
-                    ? "green-box"
-                    : status === "Failed to clone work item."
+                status.includes("Failed") || status.includes("error")
                     ? "red-box"
+                    : status.includes("successfully")
+                    ? "green-box"
                     : ""
             }`}
         >
