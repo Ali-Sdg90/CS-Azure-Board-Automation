@@ -84,7 +84,10 @@ const App = () => {
                 >
                     ◀
                 </button>
-                <span>{operationalSprintNumber}</span>
+                <span>
+                    {operationalSprintNumber +
+                        (copyMode === "operational" ? 0 : 10)}
+                </span>
                 <button
                     onClick={() =>
                         setOperationalSprintNumber((prev) => prev + 1)
