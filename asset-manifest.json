@@ -1,13 +1,13 @@
 {
   "files": {
     "main.css": "/CS-Azure-Board-Automation/static/css/main.aad02c74.css",
-    "main.js": "/CS-Azure-Board-Automation/static/js/main.3539c361.js",
+    "main.js": "/CS-Azure-Board-Automation/static/js/main.e344d0fe.js",
     "index.html": "/CS-Azure-Board-Automation/index.html",
     "main.aad02c74.css.map": "/CS-Azure-Board-Automation/static/css/main.aad02c74.css.map",
-    "main.3539c361.js.map": "/CS-Azure-Board-Automation/static/js/main.3539c361.js.map"
+    "main.e344d0fe.js.map": "/CS-Azure-Board-Automation/static/js/main.e344d0fe.js.map"
   },
   "entrypoints": [
     "static/css/main.aad02c74.css",
-    "static/js/main.3539c361.js"
+    "static/js/main.e344d0fe.js"
   ]
 }
