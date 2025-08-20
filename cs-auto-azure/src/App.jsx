@@ -55,6 +55,10 @@ const App = () => {
         }
     }, [isOkToCopy]);
 
+    useEffect(() => {
+        setIsOkToCopy("load");
+    }, [operationalSprintNumber]);
+
     // return <AzureDevOpsTeams />;
 
     return (
