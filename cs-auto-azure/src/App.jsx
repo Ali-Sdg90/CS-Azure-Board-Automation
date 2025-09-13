@@ -9,8 +9,11 @@ import { PAT_TOKEN } from "./constants/patToken";
 
 import CapacityCopier from "./components/CapacityCopier";
 import IterationCopier from "./components/IterationCopier";
-import AzureDevOpsTeams from "./components/AzureDevOpsTeams";
 import Header from "./components/Header";
+
+// Tools
+import AzureDevOpsTeams from "./components/AzureDevOpsTeams";
+import AzurePATManager from "./components/AzurePATManager";
 
 const organization = "cs-internship";
 const project = "CS Internship Program";
@@ -60,6 +63,7 @@ const App = () => {
     }, [operationalSprintNumber]);
 
     // return <AzureDevOpsTeams />;
+    // return <AzurePATManager />;
 
     return (
         <div>
